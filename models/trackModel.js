@@ -23,7 +23,7 @@ const trackSchema = mongoose.Schema({
   },
   uploader: {
     type: mongoose.Schema.ObjectId,
-    ref: User,
+    ref: "User",
     required: [true, "A track must have an uploader"],
   },
 });
