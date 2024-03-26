@@ -11,7 +11,7 @@ router
   .post(beatController.createBeat);
 
 router
-  .route(":id")
+  .route("/:id")
   .get(beatController.getBeat)
   .patch(beatController.updateBeat)
   .delete(beatController.deleteBeat);
