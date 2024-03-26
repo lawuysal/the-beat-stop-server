@@ -4,6 +4,7 @@ const morgan = require("morgan");
 
 const beatRouter = require("./routes/beatRoutes");
 const userRouter = require("./routes/userRoutes");
+const trackRouter = require("./routes/trackRoutes");
 
 const app = express();
 
@@ -17,5 +18,6 @@ app.use(express.json());
 
 app.use("/api/v1/beats", beatRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/tracks", trackRouter);
 
 module.exports = app;
