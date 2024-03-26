@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const billingSchema = mongoose.Schema({
   user: {
-    type: mongoose.Schema.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: [true, "A billing must belong to a user"],
   },
