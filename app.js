@@ -3,6 +3,7 @@ const fs = require("fs");
 const morgan = require("morgan");
 
 const beatRouter = require("./routes/beatRoutes");
+const userRouter = require("./routes/userRoutes");
 
 const app = express();
 
@@ -15,6 +16,6 @@ app.use(express.json());
 //app.use(express.static(`${__dirname}/public`));
 
 app.use("/api/v1/beats", beatRouter);
-//app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/users", userRouter);
 
 module.exports = app;
