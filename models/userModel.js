@@ -5,7 +5,7 @@ const userSchema = mongoose.Schema({
     type: String,
     required: [true, "A user must have a username"],
     unique: true,
-    lowercase,
+    lowercase: true,
   },
   name: {
     type: String,
@@ -58,12 +58,12 @@ const userSchema = mongoose.Schema({
     type: Date,
     required: [true, "A user must have a created date"],
     immutable: true,
-    default: () => new Date.now(),
+    default: () => Date.now(),
   },
   updatedAt: {
     type: Date,
     required: true,
-    default: () => new Date.now(),
+    default: () => Date.now(),
   },
 });
 
