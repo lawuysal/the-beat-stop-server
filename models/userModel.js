@@ -25,6 +25,7 @@ const userSchema = mongoose.Schema({
     type: String,
     required: [true, "A user must have a role"],
     default: "user",
+    enum: ["admin", "user"],
   },
   photo: {
     type: String,
@@ -41,15 +42,28 @@ const userSchema = mongoose.Schema({
   gender: {
     type: String,
     default: "none",
+    enum: ["male", "female", "none"],
   },
   membership: {
     type: String,
     required: [true, "A user must have a membership"],
+    enum: ["free", "standart", "premium"],
     default: "free",
   },
   lastMonthSale: {
     type: Boolean,
     required: [true, "A user must have a last month sale field"],
+  },
+  createdAt: {
+    type: Date,
+    required: [true, "A user must have a created date"],
+    immutable: true,
+    default: () => new Date.now(),
+  },
+  updatedAt: {
+    type: Date,
+    required: true,
+    default: () => new Date.now(),
   },
 });
 
