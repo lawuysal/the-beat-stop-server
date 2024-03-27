@@ -7,7 +7,7 @@ const trackSchema = mongoose.Schema({
   },
   uploadedAt: {
     type: Date,
-    default: () => new Date.now(),
+    default: () => Date.now(),
   },
   duration: {
     type: String,
@@ -17,7 +17,7 @@ const trackSchema = mongoose.Schema({
     type: String,
     required: [true, "A track must have a file type"],
   },
-  link: {
+  path: {
     type: String,
     required: [true, "A track must have a link"],
   },

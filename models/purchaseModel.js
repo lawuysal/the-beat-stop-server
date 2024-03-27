@@ -19,7 +19,7 @@ const purchaseSchema = mongoose.Schema({
   date: {
     type: Date,
     required: [true, "A purchase must have a date"],
-    default: () => new Date.now(),
+    default: () => Date.now(),
   },
   license: {
     type: String,

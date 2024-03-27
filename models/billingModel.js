@@ -13,7 +13,7 @@ const billingSchema = mongoose.Schema({
   date: {
     type: Date,
     required: [true, "A billing must have a membership"],
-    default: () => new Date.now(),
+    default: () => Date.now(),
   },
   amount: {
     type: String,
