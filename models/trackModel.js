@@ -9,10 +9,6 @@ const trackSchema = mongoose.Schema({
     type: Date,
     default: () => Date.now(),
   },
-  duration: {
-    type: String,
-    required: [true, "A track must have a duration"],
-  },
   fileType: {
     type: String,
     required: [true, "A track must have a file type"],
@@ -28,6 +24,6 @@ const trackSchema = mongoose.Schema({
   },
 });
 
-const Track = mongoose.Model("Track", trackSchema);
+const Track = mongoose.model("Track", trackSchema);
 
 module.exports = Track;
