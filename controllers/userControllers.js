@@ -5,7 +5,56 @@ const User = require("./../models/userModel");
 
 async function getAllUsers(req, res) {
   try {
-    const users = await User.find();
+    // Build Query
+    // 1A Filtering
+    let queryObj = { ...req.query };
+    const excludedFields = ["page", "limit", "sort", "fields"];
+    excludedFields.forEach((item) => delete queryObj[item]);
+
+    // If a name is specified in the query, use it
+    if (queryObj.name) {
+      queryObj.username = new RegExp(queryObj.username, "i"); // 'i' makes it case insensitive
+    }
+
+    // 1B Advanced Filtering
+    queryObj = JSON.stringify(queryObj).replace(
+      /\b(gte|lte|gt|lt)\b/g,
+      (match) => `$${match}`
+    );
+
+    let query = User.find(JSON.parse(queryObj));
+
+    // 2 Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+      console.log(req.query.sort);
+    } else {
+      query = query.sort("-_id");
+    }
+
+    // 3 Field Limiting
+    if (req.query.fields) {
+      const fields = req.query.fields.split(",").join(" ");
+      query = query.select(fields);
+    } else {
+      query = query.select("-__v");
+    }
+
+    // 4 Pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 20;
+    const skip = (page - 1) * limit;
+
+    if (req.query.page) {
+      const num = await User.countDocuments();
+      if (skip >= num) throw new Error("Page Not Found");
+    }
+
+    query = query.skip(skip).limit(limit);
+
+    // Execute Query
+    const users = await query;
 
     res.status(200).json({
       status: "success",
@@ -16,6 +65,7 @@ async function getAllUsers(req, res) {
       },
     });
   } catch (err) {
+    console.log(err);
     res.status(404).json({ status: "fail", message: err });
   }
 }
