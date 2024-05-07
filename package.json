@@ -4,16 +4,16 @@
   "description": "Init version of the server.",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "ss"
+    "url": "https://github.com/lawuysal/the-beat-stop-server"
   },
   "author": "Oğuzhan Uysal",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.1",
     "mongoose": "^5.13.22",
