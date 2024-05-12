@@ -55,6 +55,11 @@ const userSchema = mongoose.Schema({
     required: [true, "A user must have a last month sale field"],
     default: false,
   },
+  mailList: {
+    type: Boolean,
+    required: [true, "A user must have a mail list check"],
+    default: false,
+  },
   createdAt: {
     type: Date,
     required: [true, "A user must have a created date"],

@@ -15,6 +15,9 @@ async function getAllUsers(req, res) {
     if (queryObj.name) {
       queryObj.username = new RegExp(queryObj.username, "i"); // 'i' makes it case insensitive
     }
+    if (queryObj.email) {
+      queryObj.email = new RegExp(queryObj.email, "i");
+    }
 
     // 1B Advanced Filtering
     queryObj = JSON.stringify(queryObj).replace(
