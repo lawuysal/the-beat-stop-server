@@ -17,6 +17,7 @@ if (process.env.NODE_ENV === "development") {
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(`${__dirname}/dev-data`));
 
 app.use("/api/v1/beats", beatRouter);
 app.use("/api/v1/users", userRouter);
