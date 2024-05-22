@@ -16,4 +16,6 @@ router
   .patch(beatController.updateBeat)
   .delete(beatController.deleteBeat);
 
+router.route("/user/:userId").get(beatController.getUserBeats);
+
 module.exports = router;

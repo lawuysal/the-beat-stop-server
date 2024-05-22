@@ -6,11 +6,17 @@ const beatSchema = mongoose.Schema({
     required: [true, "A beat must have a name"],
     default: "Untitled Beat",
   },
+  fullTrack: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Track",
+    required: [true, "A beat must have a full track"],
+  },
   tracks: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Track",
       required: [true, "A beat must have atleast a track"],
+      default: [],
     },
   ],
   summary: {
@@ -22,11 +28,13 @@ const beatSchema = mongoose.Schema({
     type: String,
     default: "none",
   },
-  type: {
-    type: String,
-    required: [true, "A beat must have a type"],
-    default: "none",
-  },
+  type: [
+    {
+      type: String,
+      required: [true, "A beat must have a type"],
+      default: "none",
+    },
+  ],
   paid: {
     type: Boolean,
     required: [true, "A beat must have paid status"],
@@ -35,7 +43,8 @@ const beatSchema = mongoose.Schema({
   license: {
     type: String,
     required: [true, "A beat must have a license"],
-    default: free,
+    enum: ["free", "basic", "standard", "pro"],
+    default: "free",
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -56,8 +65,13 @@ const beatSchema = mongoose.Schema({
     type: String,
     default: "images/beat-images/default/default-large",
   },
+  createdDate: {
+    type: Date,
+    required: [true, "A beat must have a date"],
+    default: () => Date.now(),
+  },
 });
 
-const Beat = mongoose.Model("Beat", beatSchema);
+const Beat = mongoose.model("Beat", beatSchema);
 
 module.exports = Beat;
