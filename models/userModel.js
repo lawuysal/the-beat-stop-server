@@ -29,7 +29,7 @@ const userSchema = mongoose.Schema({
   },
   photo: {
     type: String,
-    default: "none",
+    default: "images/user-images/default/default-large",
   },
   description: {
     type: String,

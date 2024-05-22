@@ -52,6 +52,10 @@ const beatSchema = mongoose.Schema({
     required: [true, "A beat must have a key"],
     default: "C Major",
   },
+  photo: {
+    type: String,
+    default: "images/beat-images/default/default-large",
+  },
 });
 
 const Beat = mongoose.Model("Beat", beatSchema);
