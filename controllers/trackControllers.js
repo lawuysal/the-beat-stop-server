@@ -118,10 +118,29 @@ async function deleteTrack(req, res) {
   }
 }
 
+const getUserTracks = async (req, res) => {
+  try {
+    const tracks = await Track.find({ uploader: { $eq: req.params.userId } });
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        tracks,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: "Can't found the tracks for this user." + err,
+    });
+  }
+};
+
 module.exports = {
   getAllTracks,
   getTrack,
   createTrack,
   updateTrack,
   deleteTrack,
+  getUserTracks,
 };

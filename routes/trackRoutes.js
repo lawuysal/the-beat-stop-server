@@ -16,4 +16,6 @@ router
   .patch(uploadMiddleware, trackController.updateTrack)
   .delete(trackController.deleteTrack);
 
+router.route("/user/:userId").get(trackController.getUserTracks);
+
 module.exports = router;
