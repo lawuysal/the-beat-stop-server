@@ -10,16 +10,9 @@ const dbConnectionString = process.env.DB_CON_STR.replace(
   process.env.DB_PASS
 );
 
-mongoose
-  .connect(dbConnectionString, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-  })
-  .then((con) => {
-    console.log("Connected to DB");
-  });
+mongoose.connect(dbConnectionString).then((con) => {
+  console.log("Connected to DB");
+});
 
 const port = process.env.PORT;
 app.listen(port, () => {
