@@ -1,5 +1,6 @@
 const fs = require("fs");
 const Beat = require("../models/beatModel");
+const Track = require("../models/trackModel");
 
 async function getAllBeats(req, res) {
   try {
@@ -20,6 +21,26 @@ async function getAllBeats(req, res) {
 
 async function createBeat(req, res) {
   try {
+    // Photo
+    const newPhoto = req.files.photo[0];
+    const photoPath = newPhoto.path;
+
+    // Track
+    const { originalname, path, mimetype } = req.files.fullTrack[0];
+    let fileType = mimetype.split("/")[1];
+    if (fileType === "mpeg") fileType = "mp3";
+    const uploader = req.body.owner;
+
+    const newTrack = new Track({
+      uploader: uploader,
+      name: originalname,
+      path: path,
+      fileType: fileType,
+    });
+
+    const newTrackObject = await newTrack.save();
+    const newTrackId = newTrackObject._id.toString();
+
     const newBeat = {
       name: req.body.name,
       summary: req.body.summary,
@@ -29,6 +50,8 @@ async function createBeat(req, res) {
       owner: req.body.owner,
       bpm: req.body.bpm,
       key: req.body.key,
+      photo: photoPath,
+      fullTrack: newTrackId,
     };
 
     const beat = await Beat.create(newBeat);

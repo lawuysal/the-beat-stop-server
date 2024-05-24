@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const Track = require("./../models/trackModel");
-const upload = require("./../middlewares/uploadMiddleware");
+const upload = require("./../middlewares/uploadTrackMware");
 
 async function getAllTracks(req, res) {
   try {

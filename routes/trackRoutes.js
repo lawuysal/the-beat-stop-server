@@ -1,5 +1,5 @@
 const express = require("express");
-const uploadMiddleware = require("./../middlewares/uploadMiddleware");
+const uploadTrackMware = require("./../middlewares/uploadTrackMware");
 
 const trackController = require("./../controllers/trackControllers");
 
@@ -8,12 +8,12 @@ const router = express.Router();
 router
   .route("/")
   .get(trackController.getAllTracks)
-  .post(uploadMiddleware, trackController.createTrack);
+  .post(uploadTrackMware, trackController.createTrack);
 
 router
   .route("/:id")
   .get(trackController.getTrack)
-  .patch(uploadMiddleware, trackController.updateTrack)
+  .patch(uploadTrackMware, trackController.updateTrack)
   .delete(trackController.deleteTrack);
 
 router.route("/user/:userId").get(trackController.getUserTracks);

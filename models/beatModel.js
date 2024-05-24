@@ -63,7 +63,7 @@ const beatSchema = mongoose.Schema({
   },
   photo: {
     type: String,
-    default: "images/beat-images/default/default-large",
+    default: "dev-data\\images\\beat-images\\default\\default-large.jpg",
   },
   createdDate: {
     type: Date,
