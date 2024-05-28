@@ -35,13 +35,13 @@ async function createTrack(req, res) {
       fileType: fileType,
     });
 
-    await newTrack.save(); // Save to database
+    const track = await newTrack.save(); // Save to database
 
     res.status(201).json({
       status: "success",
       message: "Track uploaded successfully",
       data: {
-        newTrack,
+        track,
       },
     });
   } catch (err) {

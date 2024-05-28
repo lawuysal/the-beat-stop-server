@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const beatRouter = require("./routes/beatRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -17,6 +18,7 @@ if (process.env.NODE_ENV === "development") {
 
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(`${__dirname}/dev-data`));
 
 app.use("/api/v1/beats", beatRouter);
