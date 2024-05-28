@@ -8,6 +8,7 @@ const userRouter = require("./routes/userRoutes");
 const trackRouter = require("./routes/trackRoutes");
 const billingRouter = require("./routes/billingRoutes");
 const purchaseRouter = require("./routes/purchaseRoutes");
+const globalErrorHandler = require("./controllers/errorControllers");
 
 const app = express();
 
@@ -26,5 +27,8 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/tracks", trackRouter);
 app.use("/api/v1/billings", billingRouter);
 app.use("/api/v1/purchases", purchaseRouter);
+
+// Error Handler Middleware
+app.use(globalErrorHandler);
 
 module.exports = app;

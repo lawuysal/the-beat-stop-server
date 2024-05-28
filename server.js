@@ -1,3 +1,9 @@
+process.on("uncaughtException", (err) => {
+  console.log(err.name, " - ", err.message);
+
+  process.exit(1);
+});
+
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 
@@ -17,4 +23,13 @@ mongoose.connect(dbConnectionString).then((con) => {
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`Started to listening at ${port}...`);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.log(err.name, " - ", err.message);
+
+  // Shutting down the server gracefully
+  server.close(() => {
+    process.exit(1);
+  });
 });
