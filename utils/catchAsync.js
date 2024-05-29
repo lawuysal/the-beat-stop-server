@@ -1,7 +1,7 @@
-function CatchAsync(fn) {
+function catchAsync(fn) {
   return function (req, res, next) {
     fn(req, res, next).catch((err) => next(err));
   };
 }
 
-module.exports = CatchAsync;
+module.exports = catchAsync;

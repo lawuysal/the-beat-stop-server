@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = mongoose.Schema({
   username: {
@@ -72,6 +73,23 @@ const userSchema = mongoose.Schema({
     default: () => Date.now(),
   },
 });
+
+// Document middleware - manipulates the document before saving.
+userSchema.pre("save", async function (next) {
+  // The function call happens when only the password really changes.
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 10);
+
+  next();
+});
+
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 const User = mongoose.model("User", userSchema);
 

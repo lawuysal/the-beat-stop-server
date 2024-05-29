@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const User = require("./../models/userModel");
+const catchAsync = require("./../utils/catchAsync");
 
 async function getAllUsers(req, res) {
   try {
