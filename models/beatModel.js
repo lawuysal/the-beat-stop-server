@@ -70,6 +70,14 @@ const beatSchema = mongoose.Schema({
     required: [true, "A beat must have a date"],
     default: () => Date.now(),
   },
+  likeCount: {
+    type: Number,
+    default: 0,
+  },
+  downloadCount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Beat = mongoose.model("Beat", beatSchema);
