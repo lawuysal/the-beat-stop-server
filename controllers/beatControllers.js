@@ -1,6 +1,9 @@
 const fs = require("fs");
 const Beat = require("../models/beatModel");
 const Track = require("../models/trackModel");
+const AppError = require("../utils/AppError");
+const catchAsync = require("../utils/catchAsync");
+const { APIFeatures } = require("./../utils/apiFeatures");
 
 async function getAllBeats(req, res) {
   try {
@@ -233,6 +236,18 @@ const editBeatMain = async (req, res) => {
   }
 };
 
+const queryBeats = catchAsync(async (req, res) => {
+  const query = req.params.query;
+
+  const beats = await Beat.find({ type: query });
+
+  res.status(200).json({
+    status: "success",
+    results: beats.length,
+    beats,
+  });
+});
+
 module.exports = {
   getAllBeats,
   getBeat,
@@ -243,4 +258,5 @@ module.exports = {
   addTrack,
   deleteTrack,
   editBeatMain,
+  queryBeats,
 };

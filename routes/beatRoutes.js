@@ -28,4 +28,6 @@ router.route("/deleteTrack/:beatId/:trackId").patch(beatController.deleteTrack);
 // for editing some fields of a beat
 router.route("/editBeat/main/:beatId").patch(beatController.editBeatMain);
 
+router.route("/query/:query").get(beatController.queryBeats);
+
 module.exports = router;
