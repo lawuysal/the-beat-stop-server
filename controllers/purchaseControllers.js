@@ -1,4 +1,5 @@
-const fs = require("fs");
+const Purchase = require("../models/purchaseModel");
+const Beat = require("../models/beatModel");
 
 async function getAllPurchases(req, res) {
   try {
@@ -13,12 +14,49 @@ async function getAllPurchases(req, res) {
 
 async function createPurchase(req, res) {
   try {
+    const { seller, buyer, beatId } = req.body;
+    console.log(req.body);
+
+    const beat = await Beat.findById(beatId);
+
+    if (!beat) {
+      res.status(404).json({
+        status: "fail",
+        message: "Beat not found.",
+      });
+      return;
+    }
+
+    const { paid, license } = beat;
+
+    if (seller === buyer) {
+      res.status(400).json({
+        status: "fail",
+        message: "Seller and buyer can't be the same.",
+      });
+      return;
+    }
+
+    if (paid) {
+      res.status(400).json({
+        status: "fail",
+        message:
+          "This beat cannot be purchased, it's already purchased by someone else.",
+      });
+      return;
+    }
+
+    const newPurchase = Purchase.create({ seller, buyer, beat, license });
+    await Beat.findByIdAndUpdate(beatId, { paid: true });
+
     res.status(201).json({
       status: "success",
-      message: "createPurchase requested!",
+      message: "Beat purchased!",
     });
   } catch (err) {
-    res.status(400).json({ status: "fail", message: err });
+    res
+      .status(400)
+      .json({ status: "fail", message: "An error happened while purchasing." });
   }
 }
 
