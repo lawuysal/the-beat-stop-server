@@ -1,5 +1,6 @@
 const fs = require("fs");
 const Beat = require("../models/beatModel");
+const Purchase = require("../models/purchaseModel");
 const Track = require("../models/trackModel");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
@@ -148,6 +149,44 @@ const getUserBeats = async (req, res) => {
   }
 };
 
+const getUserSoldBeats = async (req, res) => {
+  try {
+    const purchases = await Purchase.find({ seller: req.params.userId });
+    const beatIds = purchases.map((e) => e.beat);
+    const beats = await Beat.find({ _id: { $in: beatIds } });
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        beats,
+      },
+    });
+  } catch (err) {
+    res
+      .status(404)
+      .json({ status: "fail", message: "Some error happened" + err.message });
+  }
+};
+
+const getUserBoughtBeats = async (req, res) => {
+  try {
+    const purchases = await Purchase.find({ buyer: req.params.userId });
+    const beatIds = purchases.map((e) => e.beat);
+    const beats = await Beat.find({ _id: { $in: beatIds } });
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        beats,
+      },
+    });
+  } catch (err) {
+    res
+      .status(404)
+      .json({ status: "fail", message: "Some error happened" + err.message });
+  }
+};
+
 const addTrack = async (req, res) => {
   try {
     const { beatId, trackId } = req.params;
@@ -209,13 +248,13 @@ const deleteTrack = async (req, res) => {
 
 const editBeatMain = async (req, res) => {
   try {
-    console.log("Test 1");
+    console.log(req.body);
     const { beatId } = req.params;
     const beat = await Beat.findById(beatId);
 
     let parsedTypes = [];
     if (req.body.type) {
-      parsedTypes = req.body.type.split(",").map((e) => e.trim());
+      parsedTypes = req.body.type.map((e) => e.trim());
     }
     req.body.type = parsedTypes;
 
@@ -255,6 +294,8 @@ module.exports = {
   updateBeat,
   deleteBeat,
   getUserBeats,
+  getUserSoldBeats,
+  getUserBoughtBeats,
   addTrack,
   deleteTrack,
   editBeatMain,

@@ -96,10 +96,26 @@ async function deletePurchase(req, res) {
   }
 }
 
+const isBuyer = async (req, res) => {
+  try {
+    const { beatId, userId } = req.params;
+
+    const purchase = await Purchase.findOne({ beat: beatId, buyer: userId });
+
+    res.status(200).json({
+      status: "success",
+      isBuyer: !!purchase,
+    });
+  } catch (err) {
+    res.status(404).json({ status: "fail", message: err });
+  }
+};
+
 module.exports = {
   getAllPurchases,
   getPurchase,
   createPurchase,
   updatePurchase,
   deletePurchase,
+  isBuyer,
 };

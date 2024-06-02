@@ -18,6 +18,8 @@ router
   .delete(beatController.deleteBeat);
 
 router.route("/user/:userId").get(beatController.getUserBeats);
+router.route("/user/sold/:userId").get(beatController.getUserSoldBeats);
+router.route("/user/bought/:userId").get(beatController.getUserBoughtBeats);
 
 // for adding a new beat
 router.route("/addTrack/:beatId/:trackId").patch(beatController.addTrack);

@@ -16,4 +16,6 @@ router
   .patch(purchaseController.updatePurchase)
   .delete(purchaseController.deletePurchase);
 
+router.route("/is-buyer/:beatId/:userId").get(purchaseController.isBuyer);
+
 module.exports = router;
