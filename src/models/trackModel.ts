@@ -1,6 +1,14 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Document, Model, Schema, model } from "mongoose";
 
-const trackSchema = new Schema({
+interface TrackDocument extends Document {
+  name: string;
+  uploadedAt: Date;
+  fileType: string;
+  path: string;
+  uploader: mongoose.Schema.Types.ObjectId;
+}
+
+const trackSchema = new Schema<TrackDocument>({
   name: {
     type: String,
     required: [true, "A track must have a name"],
@@ -24,6 +32,6 @@ const trackSchema = new Schema({
   },
 });
 
-const Track = model("Track", trackSchema);
+const Track: Model<TrackDocument> = model<TrackDocument>("Track", trackSchema);
 
 export default Track;

@@ -1,5 +1,12 @@
+import { Document, Query } from "mongoose";
+
 class APIFeatures {
-  constructor(query, queryString) {
+  query: Query<Document[], Document>;
+  queryString: Record<string, string>;
+  constructor(
+    query: Query<Document[], Document>,
+    queryString: Record<string, string>
+  ) {
     this.query = query;
     this.queryString = queryString;
   }
@@ -56,4 +63,5 @@ class APIFeatures {
     return this;
   }
 }
-exports.APIFeatures = APIFeatures;
+
+export default APIFeatures;

@@ -1,15 +1,14 @@
 import { unlink } from "fs";
-import Track, {
-  find,
-  findById,
-  findByIdAndUpdate,
-  findByIdAndDelete,
-} from "../models/trackModel";
+import Track from "../models/trackModel";
 import { Request, Response } from "express";
+
+interface MulterRequest extends Request {
+  file: Express.Multer.File;
+}
 
 async function getAllTracks(req: Request, res: Response) {
   try {
-    const tracks = await find();
+    const tracks = await Track.find();
 
     res.status(200).json({
       status: "success",
@@ -24,7 +23,7 @@ async function getAllTracks(req: Request, res: Response) {
   }
 }
 
-async function createTrack(req: Request, res: Response) {
+async function createTrack(req: MulterRequest, res: Response) {
   try {
     const { originalname, path, mimetype } = req.file;
     let fileType = mimetype.split("/")[1];
@@ -54,7 +53,7 @@ async function createTrack(req: Request, res: Response) {
 
 async function getTrack(req: Request, res: Response) {
   try {
-    const track = await findById(req.params.id);
+    const track = await Track.findById(req.params.id);
 
     res.status(200).json({
       status: "success",
@@ -71,7 +70,7 @@ async function getTrack(req: Request, res: Response) {
   }
 }
 
-async function updateTrack(req: Request, res: Response) {
+async function updateTrack(req: MulterRequest, res: Response) {
   try {
     const { originalname, path, mimetype } = req.file;
     let fileType = mimetype.split("/")[1];
@@ -86,10 +85,16 @@ async function updateTrack(req: Request, res: Response) {
       uploadedAt: Date.now(),
     };
 
-    const oldTrack = await findByIdAndUpdate(req.params.id, newTrackObj, {
+    const oldTrack = await Track.findByIdAndUpdate(req.params.id, newTrackObj, {
       runValidators: true,
       new: false,
     });
+    if (!oldTrack) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No track found with that ID",
+      });
+    }
     const oldPath = oldTrack.path;
     await unlink(oldPath, () => console.log("Old file deleted successfully"));
 
@@ -104,9 +109,15 @@ async function updateTrack(req: Request, res: Response) {
 
 async function deleteTrack(req: Request, res: Response) {
   try {
-    const track = await findByIdAndDelete(req.params.id);
+    const track = await Track.findByIdAndDelete(req.params.id);
+    if (!track) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No track found with that ID",
+      });
+    }
     const path = track.path;
-    await unlink(path, () => {
+    unlink(path, () => {
       console.log("File deleted successfully");
     });
 
@@ -121,7 +132,7 @@ async function deleteTrack(req: Request, res: Response) {
 
 const getUserTracks = async (req: Request, res: Response) => {
   try {
-    const tracks = await find({ uploader: { $eq: req.params.userId } });
+    const tracks = await Track.find({ uploader: { $eq: req.params.userId } });
 
     res.status(200).json({
       status: "success",
