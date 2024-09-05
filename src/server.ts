@@ -4,19 +4,22 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 
-const dotenv = require("dotenv");
-const mongoose = require("mongoose");
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import process from "process";
+import http from "http";
 
 // This method must be called before the app decleration!!!
 dotenv.config({ path: "./config.env" });
-const app = require("./app.js");
+import app from "./app.js";
 
-const dbConnectionString = process.env.DB_CON_STR.replace(
-  "<PASSWORD>",
-  process.env.DB_PASS
-);
+const server = http.createServer(app);
 
-mongoose.connect(dbConnectionString).then((con) => {
+const dbConnectionString = process.env.DB_CON_STR
+  ? process.env.DB_CON_STR.replace("<PASSWORD>", process.env.DB_PASS ?? "")
+  : "";
+
+mongoose.connect(dbConnectionString).then(() => {
   console.log("Connected to DB");
 });
 
@@ -25,7 +28,7 @@ app.listen(port, () => {
   console.log(`Started to listening at ${port}...`);
 });
 
-process.on("unhandledRejection", (err) => {
+process.on("unhandledRejection", (err: Error) => {
   console.log(err.name, " - ", err.message);
 
   // Shutting down the server gracefully

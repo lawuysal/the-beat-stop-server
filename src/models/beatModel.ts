@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const beatSchema = mongoose.Schema({
+const beatSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "A beat must have a name"],
@@ -82,4 +82,4 @@ const beatSchema = mongoose.Schema({
 
 const Beat = mongoose.model("Beat", beatSchema);
 
-module.exports = Beat;
+export default Beat;

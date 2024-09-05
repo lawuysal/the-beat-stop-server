@@ -1,10 +1,15 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const fs = require("fs");
-const User = require("./../models/userModel");
-const catchAsync = require("./../utils/catchAsync");
+import {
+  find,
+  countDocuments,
+  create,
+  findById,
+  findByIdAndUpdate,
+  findByIdAndDelete,
+  findOne,
+} from "../models/userModel";
+import { Request, Response } from "express";
 
-async function getAllUsers(req, res) {
+async function getAllUsers(req: Request, res: Response) {
   try {
     // Build Query
     // 1A Filtering
@@ -26,7 +31,7 @@ async function getAllUsers(req, res) {
       (match) => `$${match}`
     );
 
-    let query = User.find(JSON.parse(queryObj));
+    let query = find(JSON.parse(queryObj));
 
     // 2 Sorting
     if (req.query.sort) {
@@ -51,7 +56,7 @@ async function getAllUsers(req, res) {
     const skip = (page - 1) * limit;
 
     if (req.query.page) {
-      const num = await User.countDocuments();
+      const num = await countDocuments();
       if (skip >= num) throw new Error("Page Not Found");
     }
 
@@ -74,9 +79,9 @@ async function getAllUsers(req, res) {
   }
 }
 
-async function createUser(req, res) {
+async function createUser(req: Request, res: Response) {
   try {
-    const newUser = await User.create(req.body);
+    const newUser = await create(req.body);
 
     res.status(201).json({
       status: "success",
@@ -90,9 +95,9 @@ async function createUser(req, res) {
   }
 }
 
-async function getUser(req, res) {
+async function getUser(req: Request, res: Response) {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await findById(req.params.id);
 
     res.status(200).json({
       status: "success",
@@ -105,13 +110,13 @@ async function getUser(req, res) {
       },
     });
   } catch (err) {
-    res.status(404).json({ status: "fail", message: err.message });
+    res.status(404).json({ status: "fail", message: err });
   }
 }
 
-async function updateUser(req, res) {
+async function updateUser(req: Request, res: Response) {
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+    const updatedUser = await findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
@@ -128,9 +133,9 @@ async function updateUser(req, res) {
   }
 }
 
-async function deleteUser(req, res) {
+async function deleteUser(req: Request, res: Response) {
   try {
-    await User.findByIdAndDelete(req.params.id);
+    await findByIdAndDelete(req.params.id);
 
     res.status(204).json({
       status: "success",
@@ -141,13 +146,13 @@ async function deleteUser(req, res) {
   }
 }
 
-async function editUserMain(req, res) {
+async function editUserMain(req: Request, res: Response) {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await findById(req.params.userId);
     const { name, username, description, membership, mailList } = req.body;
 
     if (username !== user.username) {
-      const dublicateUser = await User.findOne({ username: username });
+      const dublicateUser = await findOne({ username: username });
 
       if (dublicateUser) {
         return res.status(400).json({
@@ -157,14 +162,10 @@ async function editUserMain(req, res) {
       }
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.userId,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const updatedUser = await findByIdAndUpdate(req.params.userId, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     res.status(200).json({
       status: "success",
@@ -175,7 +176,7 @@ async function editUserMain(req, res) {
   }
 }
 
-module.exports = {
+export default {
   getAllUsers,
   getUser,
   createUser,

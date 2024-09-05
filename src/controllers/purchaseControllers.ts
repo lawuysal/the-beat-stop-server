@@ -1,7 +1,8 @@
-const Purchase = require("../models/purchaseModel");
-const Beat = require("../models/beatModel");
+import { create, findOne } from "../models/purchaseModel";
+import { findById, findByIdAndUpdate } from "../models/beatModel";
+import { Request, Response } from "express";
 
-async function getAllPurchases(req, res) {
+async function getAllPurchases(req: Request, res: Response) {
   try {
     res.status(200).json({
       status: "success",
@@ -12,12 +13,12 @@ async function getAllPurchases(req, res) {
   }
 }
 
-async function createPurchase(req, res) {
+async function createPurchase(req: Request, res: Response) {
   try {
     const { seller, buyer, beatId } = req.body;
     console.log(req.body);
 
-    const beat = await Beat.findById(beatId);
+    const beat = await findById(beatId);
 
     if (!beat) {
       res.status(404).json({
@@ -46,8 +47,8 @@ async function createPurchase(req, res) {
       return;
     }
 
-    const newPurchase = Purchase.create({ seller, buyer, beat, license });
-    await Beat.findByIdAndUpdate(beatId, { paid: true });
+    const newPurchase = create({ seller, buyer, beat, license });
+    await findByIdAndUpdate(beatId, { paid: true });
 
     res.status(201).json({
       status: "success",
@@ -60,7 +61,7 @@ async function createPurchase(req, res) {
   }
 }
 
-async function getPurchase(req, res) {
+async function getPurchase(req: Request, res: Response) {
   try {
     res.status(200).json({
       status: "success",
@@ -74,7 +75,7 @@ async function getPurchase(req, res) {
   }
 }
 
-async function updatePurchase(req, res) {
+async function updatePurchase(req: Request, res: Response) {
   try {
     res.status(200).json({
       status: "success",
@@ -85,7 +86,7 @@ async function updatePurchase(req, res) {
   }
 }
 
-async function deletePurchase(req, res) {
+async function deletePurchase(req: Request, res: Response) {
   try {
     res.status(204).json({
       status: "success",
@@ -96,11 +97,11 @@ async function deletePurchase(req, res) {
   }
 }
 
-const isBuyer = async (req, res) => {
+const isBuyer = async (req: Request, res: Response) => {
   try {
     const { beatId, userId } = req.params;
 
-    const purchase = await Purchase.findOne({ beat: beatId, buyer: userId });
+    const purchase = await findOne({ beat: beatId, buyer: userId });
 
     res.status(200).json({
       status: "success",
@@ -111,7 +112,7 @@ const isBuyer = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   getAllPurchases,
   getPurchase,
   createPurchase,

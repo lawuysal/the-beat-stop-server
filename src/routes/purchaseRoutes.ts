@@ -1,7 +1,5 @@
-const express = require("express");
-const fs = require("fs");
-
-const purchaseController = require("./../controllers/purchaseControllers");
+import express from "express";
+import purchaseController from "./../controllers/purchaseControllers";
 
 const router = express.Router();
 
@@ -18,4 +16,4 @@ router
 
 router.route("/is-buyer/:beatId/:userId").get(purchaseController.isBuyer);
 
-module.exports = router;
+export default router;

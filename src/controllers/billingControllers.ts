@@ -1,6 +1,6 @@
-const fs = require("fs");
+import { Request, Response } from "express";
 
-async function getAllBillings(req, res) {
+async function getAllBillings(req: Request, res: Response) {
   try {
     res.status(200).json({
       status: "success",
@@ -11,7 +11,7 @@ async function getAllBillings(req, res) {
   }
 }
 
-async function createBilling(req, res) {
+async function createBilling(req: Request, res: Response) {
   try {
     res.status(201).json({
       status: "success",
@@ -22,7 +22,7 @@ async function createBilling(req, res) {
   }
 }
 
-async function getBilling(req, res) {
+async function getBilling(req: Request, res: Response) {
   try {
     res.status(200).json({
       status: "success",
@@ -36,7 +36,7 @@ async function getBilling(req, res) {
   }
 }
 
-async function updateBilling(req, res) {
+async function updateBilling(req: Request, res: Response) {
   try {
     res.status(200).json({
       status: "success",
@@ -47,7 +47,7 @@ async function updateBilling(req, res) {
   }
 }
 
-async function deleteBilling(req, res) {
+async function deleteBilling(req: Request, res: Response) {
   try {
     res.status(204).json({
       status: "success",
@@ -58,7 +58,7 @@ async function deleteBilling(req, res) {
   }
 }
 
-module.exports = {
+export default {
   getAllBillings,
   getBilling,
   createBilling,

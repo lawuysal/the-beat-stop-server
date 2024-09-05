@@ -1,14 +1,14 @@
-const express = require("express");
-const morgan = require("morgan");
-const cors = require("cors");
-const bodyParser = require("body-parser");
+import express from "express";
+import morgan from "morgan";
+import cors from "cors";
+import bodyParser from "body-parser";
 
-const beatRouter = require("./routes/beatRoutes");
-const userRouter = require("./routes/userRoutes");
-const trackRouter = require("./routes/trackRoutes");
-const billingRouter = require("./routes/billingRoutes");
-const purchaseRouter = require("./routes/purchaseRoutes");
-const globalErrorHandler = require("./controllers/errorControllers");
+import beatRouter from "./routes/beatRoutes";
+import userRouter from "./routes/userRoutes";
+import trackRouter from "./routes/trackRoutes";
+import billingRouter from "./routes/billingRoutes";
+import purchaseRouter from "./routes/purchaseRoutes";
+import globalErrorHandler from "./controllers/errorControllers";
 
 const app = express();
 
@@ -31,4 +31,4 @@ app.use("/api/v1/purchases", purchaseRouter);
 // Error Handler Middleware
 app.use(globalErrorHandler);
 
-module.exports = app;
+export default app;

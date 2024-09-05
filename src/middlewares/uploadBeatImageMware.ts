@@ -1,12 +1,17 @@
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-const { default: slugify } = require("slugify");
+import path from "path";
+import fs from "fs";
+import slugify from "slugify";
+import multer from "multer";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const userId = req.body.uploader;
-    const uploadPath = path.join("dev-data/tracks", userId);
+    const userId = req.body.owner;
+    const fieldName = file.fieldname;
+    let uploadPath = "";
+    if (fieldName === "photo")
+      uploadPath = path.join("dev-data/images/beat-images", userId);
+    if (fieldName === "fullTrack")
+      uploadPath = path.join("dev-data/tracks", userId);
 
     fs.promises
       .access(uploadPath, fs.constants.F_OK)
@@ -15,7 +20,9 @@ const storage = multer.diskStorage({
         fs.promises
           .mkdir(uploadPath, { recursive: true })
           .then(() => cb(null, uploadPath))
-          .catch((err) => cb(err, null));
+          .catch((err) =>
+            cb(err, "An error occurred while creating the folder")
+          );
       });
   },
   filename: (req, file, cb) => {
@@ -32,4 +39,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-module.exports = upload.single("file");
+export default upload.fields([
+  { name: "photo", maxCount: 1 },
+  { name: "fullTrack", maxCount: 1 },
+]);

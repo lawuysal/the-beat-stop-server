@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const trackSchema = mongoose.Schema({
+const trackSchema = new Schema({
   name: {
     type: String,
     required: [true, "A track must have a name"],
@@ -18,12 +18,12 @@ const trackSchema = mongoose.Schema({
     required: [true, "A track must have a link"],
   },
   uploader: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User",
     required: [true, "A track must have an uploader"],
   },
 });
 
-const Track = mongoose.model("Track", trackSchema);
+const Track = model("Track", trackSchema);
 
-module.exports = Track;
+export default Track;
