@@ -1,5 +1,5 @@
-import { create, findOne } from "../models/purchaseModel";
-import { findById, findByIdAndUpdate } from "../models/beatModel";
+import Purchase from "../models/purchaseModel";
+import Beat from "../models/beatModel";
 import { Request, Response } from "express";
 
 async function getAllPurchases(req: Request, res: Response) {
@@ -18,7 +18,7 @@ async function createPurchase(req: Request, res: Response) {
     const { seller, buyer, beatId } = req.body;
     console.log(req.body);
 
-    const beat = await findById(beatId);
+    const beat = await Beat.findById(beatId);
 
     if (!beat) {
       res.status(404).json({
@@ -47,17 +47,18 @@ async function createPurchase(req: Request, res: Response) {
       return;
     }
 
-    const newPurchase = create({ seller, buyer, beat, license });
-    await findByIdAndUpdate(beatId, { paid: true });
+    Purchase.create({ seller, buyer, beat, license });
+    await Beat.findByIdAndUpdate(beatId, { paid: true });
 
     res.status(201).json({
       status: "success",
       message: "Beat purchased!",
     });
   } catch (err) {
-    res
-      .status(400)
-      .json({ status: "fail", message: "An error happened while purchasing." });
+    res.status(400).json({
+      status: "fail",
+      message: "An error happened while purchasing." + err,
+    });
   }
 }
 
@@ -101,7 +102,7 @@ const isBuyer = async (req: Request, res: Response) => {
   try {
     const { beatId, userId } = req.params;
 
-    const purchase = await findOne({ beat: beatId, buyer: userId });
+    const purchase = await Beat.findOne({ beat: beatId, buyer: userId });
 
     res.status(200).json({
       status: "success",
