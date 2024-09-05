@@ -34,4 +34,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-export default upload.single("file");
+const a = upload.single("fullTrack");
+
+export default a;

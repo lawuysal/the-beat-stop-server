@@ -1,3 +1,5 @@
+import process from "process";
+
 process.on("uncaughtException", (err) => {
   console.log(err.name, " - ", err.message);
 
@@ -6,12 +8,11 @@ process.on("uncaughtException", (err) => {
 
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import process from "process";
 import http from "http";
 
 // This method must be called before the app decleration!!!
 dotenv.config({ path: "./config.env" });
-import app from "./app.js";
+import app from "./app";
 
 const server = http.createServer(app);
 

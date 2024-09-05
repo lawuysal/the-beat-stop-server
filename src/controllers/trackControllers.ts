@@ -2,10 +2,6 @@ import { unlink } from "fs";
 import Track from "../models/trackModel";
 import { Request, Response } from "express";
 
-interface MulterRequest extends Request {
-  file: Express.Multer.File;
-}
-
 async function getAllTracks(req: Request, res: Response) {
   try {
     const tracks = await Track.find();
@@ -23,9 +19,9 @@ async function getAllTracks(req: Request, res: Response) {
   }
 }
 
-async function createTrack(req: MulterRequest, res: Response) {
+async function createTrack(req: Request, res: Response) {
   try {
-    const { originalname, path, mimetype } = req.file;
+    const { originalname, path, mimetype } = req.file as Express.Multer.File;
     let fileType = mimetype.split("/")[1];
     if (fileType === "mpeg") fileType = "mp3";
     const uploader = req.body.uploader;
@@ -70,9 +66,9 @@ async function getTrack(req: Request, res: Response) {
   }
 }
 
-async function updateTrack(req: MulterRequest, res: Response) {
+async function updateTrack(req: Request, res: Response) {
   try {
-    const { originalname, path, mimetype } = req.file;
+    const { originalname, path, mimetype } = req.file as Express.Multer.File;
     let fileType = mimetype.split("/")[1];
     if (fileType === "mpeg") fileType = "mp3";
     const uploader = req.body.uploader;
@@ -96,7 +92,7 @@ async function updateTrack(req: MulterRequest, res: Response) {
       });
     }
     const oldPath = oldTrack.path;
-    await unlink(oldPath, () => console.log("Old file deleted successfully"));
+    unlink(oldPath, () => console.log("Old file deleted successfully"));
 
     res.status(200).json({
       status: "success",

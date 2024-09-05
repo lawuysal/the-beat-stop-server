@@ -2,9 +2,10 @@
   "name": "the-beat-stop",
   "version": "1.0.0",
   "description": "Init version of the server.",
-  "main": "server.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "tsc && nodemon server.js",
+    "dev": "npx tsc && nodemon src/server.ts"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
     "@types/node": "^22.5.4",
     "eslint": "^9.9.1",
     "globals": "^15.9.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.4.0"
   }
