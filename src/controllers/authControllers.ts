@@ -1,20 +1,26 @@
-import { findOne, create, findById } from "../models/userModel";
+import User, { UserDocument } from "../models/userModel";
 import catchAsync from "../utils/catchAsync";
-import { sign, verify } from "jsonwebtoken";
+import { JwtPayload, sign, verify } from "jsonwebtoken";
 import AppError from "../utils/AppError";
-import { promisify } from "util";
 import process from "process";
 import { Request, Response, NextFunction } from "express";
+import SignupRequestDTO from "../models/DTO/SignupRequestDTO";
 
-const signToken = (id) =>
-  sign({ id: id }, process.env.JWT_SECRET, {
+const signToken = (id: string) =>
+  sign({ id: id }, process.env.JWT_SECRET as string, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
 export const signup = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const dublicateUsername = await findOne({ username: req.body.username });
-    const dublicateEmail = await findOne({ email: req.body.email });
+  async (
+    req: Request<unknown, unknown, SignupRequestDTO>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const dublicateUsername = await User.findOne({
+      username: req.body.username,
+    });
+    const dublicateEmail = await User.findOne({ email: req.body.email });
 
     console.log(dublicateUsername, dublicateEmail);
 
@@ -33,7 +39,7 @@ export const signup = catchAsync(
       next(new AppError("This email is already taken.", 400));
     }
 
-    const newUser = await create({
+    const newUser = await User.create({
       username: req.body.username,
       name: req.body.name,
       email: req.body.email,
@@ -44,7 +50,7 @@ export const signup = catchAsync(
     });
 
     // signing the token
-    const token = signToken(newUser._id);
+    const token = signToken(newUser._id.toString());
 
     // 201 for created
     res.status(201).json({
@@ -68,14 +74,14 @@ export const login = catchAsync(
 
     // 2- Check if there's user with this email
     // We're adding select with "+" on the pre of pass to add it to selection again
-    const user = await findOne({ email: email }).select("+password");
+    const user = await User.findOne({ email: email }).select("+password");
 
     if (!user || !(await user.correctPassword(password, user.password))) {
       return next(new AppError("Invalid email or password", 401));
     }
 
     // 3- Sign the login token.
-    const token = signToken(user._id);
+    const token = signToken(user._id.toString());
 
     res.status(200).json({
       status: "success",
@@ -100,10 +106,14 @@ export const protect = catchAsync(
       return next(new AppError("There's no token in the headers.", 401));
     }
     // 2) Verificate the token
-    const decoded = await promisify(verify)(token, process.env.JWT_SECRET);
+    //! Make this function async
+    const decoded = verify(token, process.env.JWT_SECRET ?? "");
 
     // 3) Check if user still exist
-    const currentUser = await findById(decoded.id);
+    let currentUser: typeof User | null = null;
+    if (typeof decoded === "object" && decoded !== null && "id" in decoded) {
+      currentUser = await User.findById((decoded as JwtPayload).id);
+    }
 
     if (!currentUser) {
       return next(
@@ -123,14 +133,18 @@ export const protect = catchAsync(
     // }
 
     // Grant access to user
-    req.user = currentUser; //! might be useful
+    // req.user = currentUser; //! might be useful
     next();
   }
 );
 
-export function restrictTo(...roles) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (!roles.includes(req.user.role)) {
+export function restrictTo(...roles: string[]) {
+  return (
+    req: Request<unknown, unknown, { user: UserDocument }>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    if (!roles.includes(req.body.user.role)) {
       return next(
         new AppError("The user have no permission to access this route.", 403)
       );
@@ -139,13 +153,18 @@ export function restrictTo(...roles) {
   };
 }
 
-export const getMe = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
+export const getMe = catchAsync(
+  async (
+    req: Request<unknown, unknown, { user: UserDocument }>,
+    res: Response
+  ) => {
+    const user = req.body.user;
 
-  res.status(200).json({
-    status: "success",
-    data: {
-      user,
-    },
-  });
-});
+    res.status(200).json({
+      status: "success",
+      data: {
+        user,
+      },
+    });
+  }
+);
