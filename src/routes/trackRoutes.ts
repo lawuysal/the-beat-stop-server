@@ -1,7 +1,6 @@
-const express = require("express");
-const uploadTrackMware = require("./../middlewares/uploadTrackMware");
-
-const trackController = require("./../controllers/trackControllers");
+import express from "express";
+import uploadTrackMware from "./../middlewares/uploadTrackMware";
+import trackController from "./../controllers/trackControllers";
 
 const router = express.Router();
 
@@ -18,4 +17,4 @@ router
 
 router.route("/user/:userId").get(trackController.getUserTracks);
 
-module.exports = router;
+export default router;

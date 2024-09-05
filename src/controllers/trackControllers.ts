@@ -1,10 +1,8 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const fs = require("fs");
-const Track = require("./../models/trackModel");
-const upload = require("./../middlewares/uploadTrackMware");
+import { unlink } from "fs";
+import Track from "../models/trackModel";
+import { Request, Response } from "express";
 
-async function getAllTracks(req, res) {
+async function getAllTracks(req: Request, res: Response) {
   try {
     const tracks = await Track.find();
 
@@ -17,13 +15,13 @@ async function getAllTracks(req, res) {
       },
     });
   } catch (err) {
-    res.status(404).json({ status: "fail", message: err.message });
+    res.status(404).json({ status: "fail", message: err });
   }
 }
 
-async function createTrack(req, res) {
+async function createTrack(req: Request, res: Response) {
   try {
-    const { originalname, path, mimetype } = req.file;
+    const { originalname, path, mimetype } = req.file as Express.Multer.File;
     let fileType = mimetype.split("/")[1];
     if (fileType === "mpeg") fileType = "mp3";
     const uploader = req.body.uploader;
@@ -45,11 +43,11 @@ async function createTrack(req, res) {
       },
     });
   } catch (err) {
-    res.status(400).json({ status: "fail", message: err.message });
+    res.status(400).json({ status: "fail", message: err });
   }
 }
 
-async function getTrack(req, res) {
+async function getTrack(req: Request, res: Response) {
   try {
     const track = await Track.findById(req.params.id);
 
@@ -68,9 +66,9 @@ async function getTrack(req, res) {
   }
 }
 
-async function updateTrack(req, res) {
+async function updateTrack(req: Request, res: Response) {
   try {
-    const { originalname, path, mimetype } = req.file;
+    const { originalname, path, mimetype } = req.file as Express.Multer.File;
     let fileType = mimetype.split("/")[1];
     if (fileType === "mpeg") fileType = "mp3";
     const uploader = req.body.uploader;
@@ -87,10 +85,14 @@ async function updateTrack(req, res) {
       runValidators: true,
       new: false,
     });
+    if (!oldTrack) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No track found with that ID",
+      });
+    }
     const oldPath = oldTrack.path;
-    await fs.unlink(oldPath, () =>
-      console.log("Old file deleted successfully")
-    );
+    unlink(oldPath, () => console.log("Old file deleted successfully"));
 
     res.status(200).json({
       status: "success",
@@ -101,11 +103,17 @@ async function updateTrack(req, res) {
   }
 }
 
-async function deleteTrack(req, res) {
+async function deleteTrack(req: Request, res: Response) {
   try {
     const track = await Track.findByIdAndDelete(req.params.id);
+    if (!track) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No track found with that ID",
+      });
+    }
     const path = track.path;
-    await fs.unlink(path, () => {
+    unlink(path, () => {
       console.log("File deleted successfully");
     });
 
@@ -118,7 +126,7 @@ async function deleteTrack(req, res) {
   }
 }
 
-const getUserTracks = async (req, res) => {
+const getUserTracks = async (req: Request, res: Response) => {
   try {
     const tracks = await Track.find({ uploader: { $eq: req.params.userId } });
 
@@ -136,7 +144,7 @@ const getUserTracks = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   getAllTracks,
   getTrack,
   createTrack,

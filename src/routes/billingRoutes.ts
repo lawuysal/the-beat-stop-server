@@ -1,7 +1,6 @@
-const express = require("express");
-const fs = require("fs");
+import express from "express";
 
-const billingController = require("./../controllers/billingControllers");
+import billingController from "./../controllers/billingControllers";
 
 const router = express.Router();
 
@@ -16,4 +15,4 @@ router
   .patch(billingController.updateBilling)
   .delete(billingController.deleteBilling);
 
-module.exports = router;
+export default router;

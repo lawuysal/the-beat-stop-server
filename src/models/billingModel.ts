@@ -1,8 +1,8 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const billingSchema = mongoose.Schema({
+const billingSchema = new Schema({
   user: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User",
     required: [true, "A billing must belong to a user"],
   },
@@ -21,6 +21,6 @@ const billingSchema = mongoose.Schema({
   },
 });
 
-const Billing = mongoose.Model("Billing", billingSchema);
+const Billing = model("Billing", billingSchema);
 
-module.exports = Billing;
+export default Billing;

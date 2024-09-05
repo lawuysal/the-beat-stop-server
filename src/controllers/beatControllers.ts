@@ -1,12 +1,12 @@
-const fs = require("fs");
-const Beat = require("../models/beatModel");
-const Purchase = require("../models/purchaseModel");
-const Track = require("../models/trackModel");
-const AppError = require("../utils/AppError");
-const catchAsync = require("../utils/catchAsync");
-const { APIFeatures } = require("./../utils/apiFeatures");
+import fs from "fs";
+import Beat, { BeatDocument } from "../models/beatModel";
+import Purchase from "../models/purchaseModel";
+import Track from "../models/trackModel";
+import catchAsync from "./../utils/catchAsync";
+import { Request, Response } from "express";
+import mongoose from "mongoose";
 
-async function getAllBeats(req, res) {
+async function getAllBeats(req: Request, res: Response) {
   try {
     const beats = await Beat.find();
 
@@ -23,14 +23,18 @@ async function getAllBeats(req, res) {
   }
 }
 
-async function createBeat(req, res) {
+async function createBeat(req: Request, res: Response) {
   try {
     // Photo
-    const newPhoto = req.files.photo[0];
+    const newPhoto = (
+      req.files as { [fieldname: string]: Express.Multer.File[] }
+    ).photo[0];
     const photoPath = newPhoto.path;
 
     // Track
-    const { originalname, path, mimetype } = req.files.fullTrack[0];
+    const { originalname, path, mimetype } = (
+      req.files as { [fieldname: string]: Express.Multer.File[] }
+    ).fullTrack[0];
     let fileType = mimetype.split("/")[1];
     if (fileType === "mpeg") fileType = "mp3";
     const uploader = req.body.owner;
@@ -47,7 +51,7 @@ async function createBeat(req, res) {
 
     let parsedTypes = [];
     if (req.body.type) {
-      parsedTypes = req.body.type.split(",").map((e) => e.trim());
+      parsedTypes = req.body.type.split(",").map((e: string) => e.trim());
     }
 
     const newBeat = {
@@ -77,7 +81,7 @@ async function createBeat(req, res) {
   }
 }
 
-async function getBeat(req, res) {
+async function getBeat(req: Request, res: Response) {
   try {
     const beat = await Beat.findById(req.params.id);
 
@@ -93,7 +97,7 @@ async function getBeat(req, res) {
   }
 }
 
-async function updateBeat(req, res) {
+async function updateBeat(req: Request, res: Response) {
   try {
     res.status(200).json({
       status: "success",
@@ -104,21 +108,29 @@ async function updateBeat(req, res) {
   }
 }
 
-async function deleteBeat(req, res) {
+async function deleteBeat(req: Request, res: Response) {
   try {
-    const beat = await Beat.findByIdAndDelete(req.params.id);
-    const tracks = beat.tracks;
-    const fullTrack = await Track.findByIdAndDelete(beat.fullTrack);
-    const photoPath = beat.photo;
-    const fullTrackPath = fullTrack.path;
-    await fs.unlink(photoPath, () => console.log("Photo deleted!"));
-    await fs.unlink(fullTrackPath, () => console.log("FullTrack deleted!"));
+    const beat: BeatDocument | null = await Beat.findByIdAndDelete(
+      req.params.id
+    );
+    const tracks = beat?.tracks || [];
+    const fullTrack = beat
+      ? await Track.findByIdAndDelete(beat.fullTrack)
+      : null;
+    const photoPath = beat?.photo ?? "";
+    const fullTrackPath = fullTrack?.path;
+    fs.unlink(photoPath, () => console.log("Photo deleted!"));
+    if (fullTrackPath) {
+      fs.unlink(fullTrackPath, () => console.log("FullTrack deleted!"));
+    }
 
     if (tracks.length !== 0) {
       for (let i = 0; i < tracks.length; i++) {
         const track = await Track.findByIdAndDelete(tracks[i]);
-        const trackPath = track.path;
-        await fs.unlink(trackPath, () => console.log("Track (i) deleted!"));
+        const trackPath = track?.path;
+        if (trackPath) {
+          fs.unlink(trackPath, () => console.log("Track (i) deleted!"));
+        }
       }
     }
 
@@ -131,7 +143,7 @@ async function deleteBeat(req, res) {
   }
 }
 
-const getUserBeats = async (req, res) => {
+const getUserBeats = async (req: Request, res: Response) => {
   try {
     const beats = await Beat.find({ owner: { $eq: req.params.userId } });
 
@@ -149,7 +161,7 @@ const getUserBeats = async (req, res) => {
   }
 };
 
-const getUserSoldBeats = async (req, res) => {
+const getUserSoldBeats = async (req: Request, res: Response) => {
   try {
     const purchases = await Purchase.find({ seller: req.params.userId });
     const beatIds = purchases.map((e) => e.beat);
@@ -164,11 +176,11 @@ const getUserSoldBeats = async (req, res) => {
   } catch (err) {
     res
       .status(404)
-      .json({ status: "fail", message: "Some error happened" + err.message });
+      .json({ status: "fail", message: "Some error happened" + err });
   }
 };
 
-const getUserBoughtBeats = async (req, res) => {
+const getUserBoughtBeats = async (req: Request, res: Response) => {
   try {
     const purchases = await Purchase.find({ buyer: req.params.userId });
     const beatIds = purchases.map((e) => e.beat);
@@ -183,16 +195,22 @@ const getUserBoughtBeats = async (req, res) => {
   } catch (err) {
     res
       .status(404)
-      .json({ status: "fail", message: "Some error happened" + err.message });
+      .json({ status: "fail", message: "Some error happened" + err });
   }
 };
 
-const addTrack = async (req, res) => {
+const addTrack = async (req: Request, res: Response) => {
   try {
     const { beatId, trackId } = req.params;
 
     const beat = await Beat.findById(beatId);
-    beat.tracks = [...beat.tracks, trackId];
+    if (!beat) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Beat not found",
+      });
+    }
+    beat.tracks = [...beat.tracks, new mongoose.Schema.Types.ObjectId(trackId)];
     const newBeat = await Beat.findByIdAndUpdate(beatId, beat, {
       runValidators: true,
       new: true,
@@ -206,14 +224,13 @@ const addTrack = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({ status: "fail", message: err.message });
+    res.status(400).json({ status: "fail", message: err });
   }
 };
 
-const deleteTrack = async (req, res) => {
+const deleteTrack = async (req: Request, res: Response) => {
   try {
     const { beatId, trackId } = req.params;
-    const beat = await Beat.findById(beatId);
 
     const newBeat = await Beat.findByIdAndUpdate(
       beatId,
@@ -223,16 +240,18 @@ const deleteTrack = async (req, res) => {
         new: true,
       }
     );
-    console.log("Test 5");
 
     const track = await Track.findByIdAndDelete(trackId);
-    console.log("Test 6");
+    if (!track) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Track not found",
+      });
+    }
     const path = track.path;
-    console.log("Test 7");
-    await fs.unlink(path, () => {
+    fs.unlink(path, () => {
       console.log("Track deleted successfully");
     });
-    console.log("Test 8");
 
     res.status(201).json({
       status: "success",
@@ -242,17 +261,18 @@ const deleteTrack = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({ status: "fail", message: err.message });
+    res.status(400).json({ status: "fail", message: err });
   }
 };
 
-const editBeatMain = async (req, res) => {
+const editBeatMain = async (
+  req: Request<{ beatId: string }, unknown, { type: string[] }>,
+  res: Response
+) => {
   try {
-    console.log(req.body);
     const { beatId } = req.params;
-    const beat = await Beat.findById(beatId);
 
-    let parsedTypes = [];
+    let parsedTypes: string[] = [];
     if (req.body.type) {
       parsedTypes = req.body.type.map((e) => e.trim());
     }
@@ -271,7 +291,7 @@ const editBeatMain = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).json({ status: "fail", message: err.message });
+    res.status(400).json({ status: "fail", message: err });
   }
 };
 
@@ -287,7 +307,7 @@ const queryBeats = catchAsync(async (req, res) => {
   });
 });
 
-module.exports = {
+export default {
   getAllBeats,
   getBeat,
   createBeat,

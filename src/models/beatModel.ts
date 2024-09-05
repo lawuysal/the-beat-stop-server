@@ -1,6 +1,24 @@
-const mongoose = require("mongoose");
+import mongoose, { Model } from "mongoose";
 
-const beatSchema = mongoose.Schema({
+export interface BeatDocument extends mongoose.Document {
+  name: string;
+  fullTrack: mongoose.Schema.Types.ObjectId;
+  tracks: mongoose.Schema.Types.ObjectId[];
+  summary: string;
+  description: string;
+  type: string[];
+  paid: boolean;
+  license: string;
+  owner: mongoose.Schema.Types.ObjectId;
+  bpm: string;
+  key: string;
+  photo: string;
+  createdDate: Date;
+  likeCount: number;
+  downloadCount: number;
+}
+
+const beatSchema = new mongoose.Schema<BeatDocument>({
   name: {
     type: String,
     required: [true, "A beat must have a name"],
@@ -80,6 +98,9 @@ const beatSchema = mongoose.Schema({
   },
 });
 
-const Beat = mongoose.model("Beat", beatSchema);
+const Beat: Model<BeatDocument> = mongoose.model<BeatDocument>(
+  "Beat",
+  beatSchema
+);
 
-module.exports = Beat;
+export default Beat;

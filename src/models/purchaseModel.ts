@@ -1,18 +1,18 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const purchaseSchema = mongoose.Schema({
+const purchaseSchema = new Schema({
   seller: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User",
     required: [true, "A purchase must have a seller"],
   },
   buyer: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User",
     required: [true, "A purchase must have a buyer"],
   },
   beat: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Beat",
     required: [true, "A purchase must have a beat"],
   },
@@ -27,6 +27,6 @@ const purchaseSchema = mongoose.Schema({
   },
 });
 
-const Purchase = mongoose.model("Purchase", purchaseSchema);
+const Purchase = model("Purchase", purchaseSchema);
 
-module.exports = Purchase;
+export default Purchase;

@@ -1,32 +1,43 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const fs = require("fs");
-const User = require("./../models/userModel");
-const catchAsync = require("./../utils/catchAsync");
+import User from "../models/userModel";
+import { Request, Response } from "express";
 
-async function getAllUsers(req, res) {
+interface QueryParams {
+  [key: string]: string | number | RegExp | undefined;
+  username?: string | RegExp;
+  name?: string;
+  email?: string | RegExp | undefined;
+  sort?: string;
+  fields?: string;
+  page?: number;
+  limit?: number;
+}
+
+async function getAllUsers(
+  req: Request<unknown, unknown, unknown, QueryParams>,
+  res: Response
+) {
   try {
     // Build Query
     // 1A Filtering
-    let queryObj = { ...req.query };
+    const queryObj: QueryParams = { ...req.query };
     const excludedFields = ["page", "limit", "sort", "fields"];
     excludedFields.forEach((item) => delete queryObj[item]);
 
     // If a name is specified in the query, use it
-    if (queryObj.name) {
+    if (queryObj.name && queryObj.username) {
       queryObj.username = new RegExp(queryObj.username, "i"); // 'i' makes it case insensitive
     }
     if (queryObj.email) {
       queryObj.email = new RegExp(queryObj.email, "i");
     }
 
-    // 1B Advanced Filtering
-    queryObj = JSON.stringify(queryObj).replace(
-      /\b(gte|lte|gt|lt)\b/g,
-      (match) => `$${match}`
-    );
+    // // 1B Advanced Filtering
+    // queryObj = JSON.stringify(queryObj).replace(
+    //   /\b(gte|lte|gt|lt)\b/g,
+    //   (match) => `$${match}`
+    // );
 
-    let query = User.find(JSON.parse(queryObj));
+    let query = User.find(queryObj);
 
     // 2 Sorting
     if (req.query.sort) {
@@ -46,9 +57,9 @@ async function getAllUsers(req, res) {
     }
 
     // 4 Pagination
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 20;
-    const skip = (page - 1) * limit;
+    const page: number = req.query.page || 1;
+    const limit: number = req.query.limit || 20;
+    const skip: number = (page - 1) * limit;
 
     if (req.query.page) {
       const num = await User.countDocuments();
@@ -74,7 +85,7 @@ async function getAllUsers(req, res) {
   }
 }
 
-async function createUser(req, res) {
+async function createUser(req: Request, res: Response) {
   try {
     const newUser = await User.create(req.body);
 
@@ -90,7 +101,7 @@ async function createUser(req, res) {
   }
 }
 
-async function getUser(req, res) {
+async function getUser(req: Request, res: Response) {
   try {
     const user = await User.findById(req.params.id);
 
@@ -105,11 +116,11 @@ async function getUser(req, res) {
       },
     });
   } catch (err) {
-    res.status(404).json({ status: "fail", message: err.message });
+    res.status(404).json({ status: "fail", message: err });
   }
 }
 
-async function updateUser(req, res) {
+async function updateUser(req: Request, res: Response) {
   try {
     const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -128,7 +139,7 @@ async function updateUser(req, res) {
   }
 }
 
-async function deleteUser(req, res) {
+async function deleteUser(req: Request, res: Response) {
   try {
     await User.findByIdAndDelete(req.params.id);
 
@@ -141,10 +152,17 @@ async function deleteUser(req, res) {
   }
 }
 
-async function editUserMain(req, res) {
+async function editUserMain(req: Request, res: Response) {
   try {
     const user = await User.findById(req.params.userId);
-    const { name, username, description, membership, mailList } = req.body;
+    if (!user) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No user found with that ID",
+      });
+    }
+
+    const { username } = req.body;
 
     if (username !== user.username) {
       const dublicateUser = await User.findOne({ username: username });
@@ -157,14 +175,10 @@ async function editUserMain(req, res) {
       }
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.userId,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    await User.findByIdAndUpdate(req.params.userId, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     res.status(200).json({
       status: "success",
@@ -175,7 +189,7 @@ async function editUserMain(req, res) {
   }
 }
 
-module.exports = {
+export default {
   getAllUsers,
   getUser,
   createUser,

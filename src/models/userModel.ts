@@ -1,7 +1,29 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+import mongoose, { Model, ObjectId } from "mongoose";
+import bcrypt from "bcryptjs";
 
-const userSchema = mongoose.Schema({
+export interface UserDocument extends mongoose.Document {
+  _id: ObjectId;
+  username: string;
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+  photo: string;
+  description: string;
+  age: string;
+  gender: string;
+  membership: string;
+  lastMonthSale: boolean;
+  mailList: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  correctPassword: (
+    candidatePassword: string,
+    userPassword: string
+  ) => Promise<boolean>;
+}
+
+const userSchema = new mongoose.Schema<UserDocument>({
   username: {
     type: String,
     required: [true, "A user must have a username"],
@@ -85,12 +107,15 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.correctPassword = async function (
-  candidatePassword,
-  userPassword
-) {
+  candidatePassword: string,
+  userPassword: string
+): Promise<boolean> {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-const User = mongoose.model("User", userSchema);
+const User: Model<UserDocument> = mongoose.model<UserDocument>(
+  "User",
+  userSchema
+);
 
-module.exports = User;
+export default User;
