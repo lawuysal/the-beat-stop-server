@@ -1,6 +1,7 @@
 import mongoose, { Document, Model, Schema, model } from "mongoose";
 
 interface TrackDocument extends Document {
+  _id: mongoose.Schema.Types.ObjectId;
   name: string;
   uploadedAt: Date;
   fileType: string;
